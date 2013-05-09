@@ -2,6 +2,7 @@
 
 DEFAULT_PPN=12
 
+
 is_num()
 {
     [ $# -eq 1 ] || exit 1
@@ -26,7 +27,7 @@ print_line()
 
 print_warn_prefix()
 {
-    echo -ne " \033[01;31m !!! Warning: \033[00;37m "
+    echo -ne "\033[01;31m!!! Warning: \033[00;37m "
 }
     
 
@@ -53,6 +54,8 @@ print_usage()
     echo "Usage: $1 <jobnames>"
 }
 
+
+MAX_PPN=12
 
 if [ $# -lt 1 ]; then
 	print_usage
@@ -84,6 +87,11 @@ do
 
         jobnames="${jobnames} ${jobname}"
         echo -e "JobName: " ${jobname} 
+        if [ ${PPN} -gt ${MAX_PPN} ]; then
+            print_warn_prefix
+            echo "We can not use so many CPU: ${PPN}, decrease to ${MAX_PPN} instead"
+            PPN=${MAX_PPN}
+        fi
         echo -e "CPU: " ${PPN}
 
         qsubcmd="qsub -N $jobname -l nodes=1:ppn=${PPN} /home/zcchen/scripts/mypbs.sh"
