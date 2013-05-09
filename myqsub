@@ -1,14 +1,99 @@
 #!/bin/bash
 
+DEFAULT_PPN=12
 
-if [ $# -lt 2 ]; then
-	PPN=12
-else
-	PPN=$2
+is_num()
+{
+    [ $# -eq 1 ] || exit 1
+    echo $1 | grep -q '^[0-9]*$' 
+    if [ $? -eq 0 ]; then
+        return 0
+    fi
+    return 1
+}
+
+main_name()
+{
+    mainname=$(echo $1 | awk -F'.' '{print $1}')
+    echo $mainname
+}
+
+print_line()
+{
+    echo -e "========================================================"
+    #echo -e "\033[01;33m------------------------------------------------------------- \033[00;37m "
+}
+
+print_warn_prefix()
+{
+    echo -ne " \033[01;31m !!! Warning: \033[00;37m "
+}
+    
+
+is_valid_input_file()
+{
+    valid_suffix="inp xmi com gjf"
+    for suf in ${valid_suffix}
+    do
+        if [ -f $1.${suf} ]; then
+            print_line
+            echo -e "Input file: " $1.${suf} "\t"
+            return 0
+        fi
+    done
+
+    print_warn_prefix
+    echo "could not find input file for job: " $1
+
+    return 1
+}
+
+print_usage()
+{
+    echo "Usage: $1 <jobnames>"
+}
+
+
+if [ $# -lt 1 ]; then
+	print_usage
+    exit 1
 fi
 
-echo $PPN
+
+PPN=${DEFAULT_PPN}
+declare jobnames
+
+for file in $@
+do
+    is_num ${file}
+    if [[ $? -eq 0 ]]; then
+        #echo "ppn is set to " ${file} 
+        PPN=${file}
+    else
+        jobname=$(main_name ${file})
+        echo ${jobnames} | grep -q ${jobname} 
+        if [ $? -eq 0 ]; then
+            print_warn_prefix
+            echo ${jobname} "have been submitted already"
+            continue
+        fi
+
+        is_valid_input_file ${jobname} || continue
 
 
-qsub -N $1  -l nodes=1:ppn=${PPN} /home/zcchen/scripts/mypbs.sh
+
+        jobnames="${jobnames} ${jobname}"
+        echo -e "JobName: " ${jobname} 
+        echo -e "CPU: " ${PPN}
+
+        qsubcmd="qsub -N $jobname -l nodes=1:ppn=${PPN} /home/zcchen/scripts/mypbs.sh"
+        echo "qsub command: " $qsubcmd
+        ${qsubcmd} && echo -e "\033[01;32mSubmitted successfully\033[00;37m"
+        print_line
+
+
+    fi
+done
+
 exit 0
+
