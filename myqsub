@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DEFAULT_PPN=12
+PBS_SCRIPT="/home/zcchen/scripts/mypbs.sh"
 
 
 is_num()
@@ -84,7 +85,6 @@ do
         is_valid_input_file ${jobname} || continue
 
 
-
         jobnames="${jobnames} ${jobname}"
         echo -e "JobName: " ${jobname} 
         if [ ${PPN} -gt ${MAX_PPN} ]; then
@@ -94,7 +94,7 @@ do
         fi
         echo -e "CPU: " ${PPN}
 
-        qsubcmd="qsub -N $jobname -l nodes=1:ppn=${PPN} /home/zcchen/scripts/mypbs.sh"
+        qsubcmd="qsub -N $jobname -l nodes=1:ppn=${PPN} ${PBS_SCRIPT}"
         echo "qsub command: " $qsubcmd
         ${qsubcmd} && echo -e "\033[01;32mSubmitted successfully\033[00;37m"
         print_line
