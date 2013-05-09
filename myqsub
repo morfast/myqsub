@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+if [ $# -lt 2 ]; then
+	PPN=12
+else
+	PPN=$2
+fi
+
+echo $PPN
+
+
+qsub -N $1  -l nodes=1:ppn=${PPN} /home/zcchen/scripts/mypbs.sh
+exit 0
