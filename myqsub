@@ -51,7 +51,7 @@ is_valid_input_file()
 
 print_usage()
 {
-    echo "Usage: $1 <jobnames>"
+    echo "Usage: $0 <jobnames>"
 }
 
 
