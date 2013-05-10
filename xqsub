@@ -1,9 +1,5 @@
 #!/bin/bash
 
-DEFAULT_PPN=12
-PBS_SCRIPT="/home/zcchen/scripts/mypbs.sh"
-
-
 is_num()
 {
     [ $# -eq 1 ] || exit 1
@@ -55,8 +51,40 @@ print_usage()
     echo "Usage: $0 <jobnames>"
 }
 
+check_variables()
+{
+    if [ -z ${XQSUB_PBS_SCRIPT} ]; then
+        echo "Please set XQSUB_PBS_SCRIPT in your .bashrc"
+        exit 1
+    fi
+    
+    if [ ! -f $XQSUB_PBS_SCRIPT ]; then
+        echo "${XQSUB_PBS_SCRIPT} not found"
+        echo "Please check XQSUB_PBS_SCRIPT in your .bashrc"
+        exit 1
+    fi
+    
+    if [ -z $XQSUB_DEFAULT_PPN ]; then
+        echo "Please set XQSUB_DEFAULT_PPN in your .bashrc"
+        exit 1
+    fi
+    
+    is_num $XQSUB_DEFAULT_PPN
+    if [[ $? -ne 0 ]]; then
+        echo "XQSUB_DEFAULT_PPN should be a number"
+        echo "Please check XQSUB_PBS_SCRIPT in your .bashrc"
+        exit 1
+    fi
+    
+    if [[ $XQSUB_DEFAULT_PPN -gt ${MAX_PPN} ]]; then
+        echo "XQSUB_DEFAULT_PPN should be smaller than ${MAX_PPN}"
+        echo "Please check XQSUB_DEFAULT_PPN in your .bashrc"
+        exit 1
+    fi
+}
 
 MAX_PPN=12
+check_variables
 
 if [ $# -lt 1 ]; then
 	print_usage
@@ -64,7 +92,7 @@ if [ $# -lt 1 ]; then
 fi
 
 
-PPN=${DEFAULT_PPN}
+PPN=${XQSUB_DEFAULT_PPN}
 declare jobnames
 
 for file in $@
@@ -94,7 +122,7 @@ do
         fi
         echo -e "CPU: " ${PPN}
 
-        qsubcmd="qsub -N $jobname -l nodes=1:ppn=${PPN} ${PBS_SCRIPT}"
+        qsubcmd="qsub -N $jobname -l nodes=1:ppn=${PPN} ${XQSUB_PBS_SCRIPT}"
         echo "qsub command: " $qsubcmd
         ${qsubcmd} && echo -e "\033[01;32mSubmitted successfully\033[00;37m"
         print_line
