@@ -24,7 +24,7 @@ print_line()
 
 print_warn_prefix()
 {
-    echo -ne "\033[01;31m!!! Warning: \033[00;37m "
+    echo -ne "\033[01;31m!!! Warning: \033[0m "
 }
     
 
@@ -124,7 +124,7 @@ do
 
         qsubcmd="qsub -N $jobname -l nodes=1:ppn=${PPN} ${XQSUB_PBS_SCRIPT}"
         echo "qsub command: " $qsubcmd
-        ${qsubcmd} && echo -e "\033[01;32mSubmitted successfully\033[00;37m"
+        ${qsubcmd} && echo -e "\033[01;32mSubmitted successfully\033[0m"
         print_line
 
 
