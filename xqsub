@@ -48,7 +48,7 @@ is_valid_input_file()
 
 print_usage()
 {
-    echo "Usage: $0 <jobnames>"
+    echo "Usage: $(basename $0) <jobnames>"
 }
 
 check_variables()
