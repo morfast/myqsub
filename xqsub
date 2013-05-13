@@ -103,7 +103,7 @@ do
         PPN=${file}
     else
         jobname=$(main_name ${file})
-        echo ${jobnames} | grep -q ${jobname} 
+        echo " ${jobnames} " | grep -q " ${jobname} "
         if [ $? -eq 0 ]; then
             print_warn_prefix
             echo ${jobname} "have been submitted already"
